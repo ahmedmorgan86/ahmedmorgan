@@ -1051,12 +1051,89 @@ footer{
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js';document.head.appendChild(s);"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="site-data.js"></script>
+<script src="portfolio-store.js"></script>
 
 <script>
 /* ============================================================
    DATA
    ============================================================ */
-const SKILLS = [
+
+/* ============================================================
+   DYNAMIC DATA INTEGRATION (ADMIN & PORTFOLIO STORE)
+   ============================================================ */
+const _STORE_DATA = (window.PortfolioStore && window.PortfolioStore.getData()) || (window.DEFAULT_PORTFOLIO_DATA || null);
+
+// Dynamic profile hydration
+if (_STORE_DATA && _STORE_DATA.profile) {
+  const p = _STORE_DATA.profile;
+  // Update status badge
+  const statusSpan = document.querySelector('.status-dot + span');
+  if (statusSpan && p.status) statusSpan.textContent = p.status;
+  
+  // Update status dot color if unavailable
+  const statusDot = document.querySelector('.status-dot');
+  if (statusDot && p.statusAvailable === false) {
+    statusDot.style.background = '#ff4757';
+    statusDot.style.boxShadow = '0 0 8px rgba(255,71,87,0.6)';
+  }
+
+  // Update location
+  const locSpan = document.querySelector('.hero-eyebrow span:last-child');
+  if (locSpan && p.location) locSpan.textContent = p.location;
+
+  // Update hero bio
+  const bioEl = document.querySelector('.hero-desc');
+  if (bioEl && p.bio) bioEl.textContent = p.bio;
+
+  // Update portrait
+  const portraitImg = document.getElementById('heroPortrait');
+  if (portraitImg && p.portrait) portraitImg.src = p.portrait;
+}
+
+// Dynamic about hydration
+if (_STORE_DATA && _STORE_DATA.about) {
+  const a = _STORE_DATA.about;
+  const aboutTitleEl = document.querySelector('#about .section-title');
+  if (aboutTitleEl && a.title) aboutTitleEl.innerHTML = a.title.replace('\n', '<br>');
+
+  const copyContainer = document.querySelector('#about .about-copy');
+  if (copyContainer && a.paragraphs && a.paragraphs.length) {
+    copyContainer.innerHTML = a.paragraphs.map(text => `<p class="reveal">${text}</p>`).join('');
+  }
+
+  // Counters
+  const counterWrap = document.querySelector('#about .counters');
+  if (counterWrap && a.counters && a.counters.length) {
+    counterWrap.innerHTML = a.counters.map(c => `
+      <div class="counter reveal">
+        <div class="num" data-count="${c.num}">0</div>
+        <div class="label">${c.label}</div>
+      </div>
+    `).join('');
+  }
+
+  // About timeline
+  const tlWrap = document.querySelector('#about .timeline');
+  if (tlWrap && a.timeline && a.timeline.length) {
+    tlWrap.innerHTML = a.timeline.map(t => `
+      <div class="tl-item reveal">
+        <div class="tl-tag">${t.tag}</div>
+        <h4>${t.title}</h4>
+        <p>${t.desc}</p>
+      </div>
+    `).join('');
+  }
+}
+
+// Dynamic contact hydration
+if (_STORE_DATA && _STORE_DATA.contact) {
+  const c = _STORE_DATA.contact;
+  const cTitleEl = document.querySelector('#contact .section-title');
+  if (cTitleEl && c.title) cTitleEl.innerHTML = c.title.replace('\n', '<br>');
+}
+
+const _FALLBACK_SKILLS = [
   {name:'React', role:'UI Library', desc:'Core UI layer across every web project — component architecture, hooks and state patterns built for scale.'},
   {name:'Next.js', role:'Framework', desc:'App Router, server components and edge-ready rendering — the backbone of Morgan ERP and Morgan Store.'},
   {name:'TypeScript', role:'Language', desc:'Strict typing end to end — contracts between UI, API and database that catch mistakes before runtime.'},
@@ -1073,7 +1150,7 @@ const SKILLS = [
   {name:'Linux', role:'Systems', desc:'Home environment for deployment, tooling and the servers everything above runs on.'}
 ];
 
-const PROJECTS = [
+const _FALLBACK_PROJECTS = [
   {
     idx:'01', name:'Morgan ERP',
     tagline:'A modular ERP platform covering HR, finance, sales, inventory, CRM, projects and reporting.',
@@ -1124,7 +1201,7 @@ const PROJECTS = [
   }
 ];
 
-const METRO = [
+const _FALLBACK_METRO = [
   {tag:'STATION 01', title:'Enterprise Foundations', desc:'ACCHCO EUSMS and Network Nexus — IT service management and live network monitoring built for daily operational use.'},
   {tag:'STATION 02', title:'Client-Facing Platforms', desc:'alexcont.com — a bilingual corporate site taken through full evaluation and redesign.'},
   {tag:'STATION 03', title:'Commerce &amp; Operations', desc:'Morgan Store — storefront and commerce systems built for real transactions.'},
@@ -1132,7 +1209,7 @@ const METRO = [
   {tag:'NOW', title:'Next System', desc:'Exploring AI-assisted engineering workflows and new product ideas.'}
 ];
 
-const SERVICES = [
+const _FALLBACK_SERVICES = [
   {icon:'code', title:'Full-Stack Web Apps', back:'Next.js/React front ends backed by properly modeled databases and typed APIs — built to be extended, not rewritten.'},
   {icon:'desktop', title:'Desktop &amp; Enterprise Software', back:'WPF/.NET applications for internal tools — ticketing systems, monitoring dashboards, anything that needs to run reliably on a Windows machine.'},
   {icon:'cart', title:'E-commerce &amp; Storefronts', back:'Storefronts with real merchandising controls — collections, filters, wishlist and cart — without unnecessary backend weight.'},
@@ -1141,7 +1218,7 @@ const SERVICES = [
   {icon:'grid', title:'UI/UX &amp; Design Systems', back:'Dark, disciplined interfaces with consistent tokens — built so design and code never drift apart.'}
 ];
 
-const APPROACH = [
+const _FALLBACK_APPROACH = [
   {n:'01', title:'Architecture before pixels', desc:'Data model and module boundaries get decided before any UI is built — it is far cheaper to fix on paper.'},
   {n:'02', title:'Typed, end to end', desc:'TypeScript from the database to the browser, so a bad assumption fails at compile time, not in production.'},
   {n:'03', title:'RTL is not an afterthought', desc:'Arabic-first interfaces are designed for RTL from the first sketch, not patched in later.'},
@@ -1150,7 +1227,16 @@ const APPROACH = [
   {n:'06', title:'Ship, then iterate', desc:'A working system in production teaches more than another week of planning.'}
 ];
 
+
+// Active arrays from Portfolio Store or Fallback
+const SKILLS = (_STORE_DATA && _STORE_DATA.skills && _STORE_DATA.skills.length) ? _STORE_DATA.skills : _FALLBACK_SKILLS;
+const PROJECTS = (_STORE_DATA && _STORE_DATA.projects && _STORE_DATA.projects.length) ? _STORE_DATA.projects : _FALLBACK_PROJECTS;
+const METRO = (_STORE_DATA && _STORE_DATA.experience && _STORE_DATA.experience.length) ? _STORE_DATA.experience : _FALLBACK_METRO;
+const SERVICES = (_STORE_DATA && _STORE_DATA.services && _STORE_DATA.services.length) ? _STORE_DATA.services : _FALLBACK_SERVICES;
+const APPROACH = (_STORE_DATA && _STORE_DATA.approach && _STORE_DATA.approach.length) ? _STORE_DATA.approach : _FALLBACK_APPROACH;
+
 const ICONS = {
+
   code:'<path d="M8 6 2 12l6 6M16 6l6 6-6 6M14 4l-4 16"/>',
   desktop:'<rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20h8M12 16v4"/>',
   cart:'<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M3 4h2l2.5 12h11L21 8H6.5"/>',
@@ -1396,7 +1482,7 @@ function startPageAnimations(){
 
 function animateHeroName(){
   const el = document.getElementById('heroName');
-  const text = 'Ahmed Morgan';
+  const text = (_STORE_DATA && _STORE_DATA.profile && _STORE_DATA.profile.name) ? _STORE_DATA.profile.name : 'Ahmed Morgan';
   el.innerHTML = '';
   [...text].forEach((ch,i)=>{
     const span = document.createElement('span');
@@ -1415,7 +1501,7 @@ function animateHeroName(){
 }
 
 function animateRoles(){
-  const roles = ['Senior Full-Stack Developer','AI Engineer','Software Architect','UI/UX Enthusiast'];
+  const roles = (_STORE_DATA && _STORE_DATA.profile && _STORE_DATA.profile.roles && _STORE_DATA.profile.roles.length) ? _STORE_DATA.profile.roles : ['Senior Full-Stack Developer','AI Engineer','Software Architect','UI/UX Enthusiast'];
   const el = document.getElementById('roleText');
   let ri=0;
   function type(){
@@ -1817,6 +1903,15 @@ if(backTop){
 }
 
 window.addEventListener('resize', ()=>sizeCanvas(pCanvas));
+
+// Keyboard shortcut: Ctrl + Shift + A to open Admin Dashboard
+window.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+    e.preventDefault();
+    window.location.href = 'admin.html';
+  }
+});
+
 </script>
 </body>
 </html>

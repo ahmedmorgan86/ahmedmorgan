@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم | إدارة موقع أحمد مرجان</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090a0f;
+      --card-bg: #11131c;
+      --card-hover: #161925;
+      --border: #202436;
+      --border-focus: #ffb800;
+      --amber: #ffb800;
+      --amber-glow: rgba(255, 184, 0, 0.18);
+      --amber-dim: #cca020;
+      --text: #e6e8ee;
+      --text-muted: #8c93a8;
+      --danger: #ff4757;
+      --danger-dim: rgba(255, 71, 87, 0.15);
+      --success: #2ed573;
+      --success-dim: rgba(46, 213, 115, 0.15);
+      --radius: 12px;
+      --font-main: 'Cairo', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #262a3e; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--amber-dim); }
+
+    /* Login Overlay */
+    #loginOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 10, 15, 0.95);
+      backdrop-filter: blur(14px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    .login-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      background: var(--amber-glow);
+      border: 1px solid var(--amber);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--amber);
+    }
+    .login-icon svg { width: 32px; height: 32px; }
+    .login-card h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+    .login-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+    .pin-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: #0b0c13;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 18px;
+      text-align: center;
+      letter-spacing: 4px;
+      font-family: var(--font-mono);
+      outline: none;
+      margin-bottom: 20px;
+      transition: border-color .2s;
+    }
+    .pin-input:focus { border-color: var(--amber); box-shadow: 0 0 10px var(--amber-glow); }
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: var(--amber);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform .15s, background .15s;
+    }
+    .btn-login:hover { background: #ffc424; transform: translateY(-2px); }
+    .login-hint { font-size: 12px; color: var(--text-muted); margin-top: 15px; font-family: var(--font-mono); }
+
+    /* Admin Layout */
+    .admin-container {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--card-bg);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sidebar-logo {
+      width: 40px;
+      height: 40px;
+      background: var(--amber-glow);
+      border: 1px solid var(--amber);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--amber);
+      font-weight: 800;
+      font-size: 18px;
+      font-family: var(--font-mono);
+    }
+    .sidebar-title h1 { font-size: 16px; font-weight: 700; color: #fff; }
+    .sidebar-title p { font-size: 11px; color: var(--text-muted); }
+
+    .nav-tabs {
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font-main);
+      text-align: right;
+      width: 100%;
+      transition: all .2s;
+    }
+    .nav-tab svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .nav-tab:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .nav-tab.active {
+      background: var(--amber-glow);
+      color: var(--amber);
+      border: 1px solid rgba(255, 184, 0, 0.3);
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 32px 40px;
+      overflow-y: auto;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .page-title h2 { font-size: 26px; font-weight: 800; color: #fff; }
+    .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font-main);
+      cursor: pointer;
+      transition: all .2s;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+    .btn svg { width: 16px; height: 16px; }
+    .btn-primary { background: var(--amber); color: #000; border-color: var(--amber); }
+    .btn-primary:hover { background: #ffc424; transform: translateY(-1px); }
+    .btn-secondary { background: #161926; color: #fff; border-color: var(--border); }
+    .btn-secondary:hover { background: #1f2334; border-color: #383e58; }
+    .btn-danger { background: var(--danger-dim); color: var(--danger); border-color: rgba(255,71,87,0.3); }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+
+    /* Content Panels */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeIn .25s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Cards & Form Controls */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .glass-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .glass-card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 11px 14px;
+      background: #0c0e16;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      font-family: var(--font-main);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-control:focus { border-color: var(--amber); }
+    textarea.form-control { min-height: 100px; resize: vertical; line-height: 1.6; }
+
+    /* Image Preview & Upload */
+    .image-uploader {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .image-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      border: 2px dashed var(--border);
+      background: #0c0e16;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .image-preview-empty {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+      padding: 10px;
+    }
+
+    /* Items List (Projects, Skills, Services, etc.) */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .item-card {
+      background: #0e101a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      position: relative;
+      transition: border-color .2s, transform .2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .item-card:hover {
+      border-color: rgba(255,184,0,0.4);
+      transform: translateY(-2px);
+    }
+    .item-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .item-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--amber-glow);
+      color: var(--amber);
+      border: 1px solid rgba(255,184,0,0.3);
+    }
+    .item-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .item-card-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .item-card-body {
+      color: #b1b7c8;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 10px 0 16px;
+      flex: 1;
+    }
+    .item-card-img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+    .item-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .item-tag {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: #191c2b;
+      color: #8c93a8;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .item-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid #1a1e2f;
+      padding-top: 12px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 680px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    }
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 18px; font-weight: 700; color: #fff; }
+    .btn-close-modal {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+    }
+    .btn-close-modal:hover { color: #fff; }
+    .modal-body { padding: 24px; }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      background: #151824;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: slideIn .2s ease-out;
+    }
+    @keyframes slideIn { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--danger); }
+    .toast-icon { width: 18px; height: 18px; }
+
+    /* Overview Stat Cards */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--amber-glow);
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .stat-icon svg { width: 24px; height: 24px; }
+    .stat-info .num { font-size: 26px; font-weight: 800; color: #fff; font-family: var(--font-mono); }
+    .stat-info .lbl { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Tags input */
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 10px;
+      background: #0c0e16;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-height: 44px;
+      align-items: center;
+    }
+    .tag-badge {
+      background: #1c2132;
+      color: var(--amber);
+      border: 1px solid rgba(255,184,0,0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag-remove {
+      cursor: pointer;
+      color: #999;
+      font-weight: bold;
+    }
+    .tag-remove:hover { color: var(--danger); }
+    .tag-input-field {
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    /* Switch toggle */
+    .switch-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      background-color: #24293c;
+      border-radius: 24px;
+      transition: .2s;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: .2s;
+    }
+    input:checked + .slider { background-color: var(--amber); }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .admin-container { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; border-left: none; border-bottom: 1px solid var(--border); }
+      .nav-tabs { flex-direction: row; flex-wrap: wrap; }
+      .nav-tab { width: auto; }
+      .main-content { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ LOGIN OVERLAY ============ -->
+  <div id="loginOverlay">
+    <div class="login-card">
+      <div class="login-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h2>تسجيل الدخول للوحة التحكم</h2>
+      <p>أدخل كلمة مرور المسؤول لتعديل وإدارة كافة محتويات الموقع</p>
+      <input type="password" id="adminPinInput" class="pin-input" placeholder="••••••" autofocus>
+      <button class="btn-login" id="btnLogin">دخول للوحة التحكم</button>
+      <p class="login-hint">كلمة المرور الافتراضية: 123456 (يمكن تغييرها من الإعدادات)</p>
+    </div>
+  </div>
+
+  <!-- ============ ADMIN CONTAINER ============ -->
+  <div class="admin-container" id="adminContainer" style="display:none;">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">AM</div>
+        <div class="sidebar-title">
+          <h1>أحمد مرجان</h1>
+          <p>لوحة تحكم الموقع الشاملة</p>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          نظرة عامة
+        </button>
+        <button class="nav-tab" data-tab="profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          الملف الشخصي والواجهة
+        </button>
+        <button class="nav-tab" data-tab="about">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          نبذة عني والإحصائيات
+        </button>
+        <button class="nav-tab" data-tab="skills">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          المهارات والتقنيات (14)
+        </button>
+        <button class="nav-tab" data-tab="projects">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          المشاريع والأعمال
+        </button>
+        <button class="nav-tab" data-tab="experience">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          مسار الخبرات (Build Log)
+        </button>
+        <button class="nav-tab" data-tab="services">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          الخدمات (Services)
+        </button>
+        <button class="nav-tab" data-tab="approach">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+          منهجية العمل (Approach)
+        </button>
+        <button class="nav-tab" data-tab="contact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          التواصل والبيانات
+        </button>
+        <button class="nav-tab" data-tab="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          الإعدادات والنسخ
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="index.html" target="_blank" class="btn btn-secondary" style="justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          معاينة الموقع مباشرة
+        </a>
+        <button id="btnLogout" class="btn btn-danger btn-sm" style="justify-content:center;">تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <!-- MAIN BODY -->
+    <main class="main-content">
+      
+      <!-- TOP BAR -->
+      <header class="top-bar">
+        <div class="page-title">
+          <h2 id="currentTabTitle">نظرة عامة على الموقع</h2>
+          <p id="currentTabDesc">إدارة ومتابعة عناصر الموقع والبيانات المحفوظة</p>
+        </div>
+        <div class="top-actions">
+          <button id="btnSaveAll" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            حفظ التغييرات
+          </button>
+          <a href="index.html" target="_blank" class="btn btn-secondary">
+            عرض الموقع
+          </a>
+        </div>
+      </header>
+
+      <!-- ================= TAB 1: DASHBOARD ================= -->
+      <section id="tab-dashboard" class="tab-panel active">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <div class="stat-info">
+              <div class="num" id="statProjectsCount">0</div>
+              <div class="lbl">مشاريع منشورة</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            </div>
+            <div class="stat-info">
+              <div class="num" id="statSkillsCount">0</div>
+              <div class="lbl">تقنية في النواة (Core)</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div class="stat-info">
+              <div class="num" id="statTimelineCount">0</div>
+              <div class="lbl">محطات في المسار</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </div>
+            <div class="stat-info">
+              <div class="num" id="statServicesCount">0</div>
+              <div class="lbl">خدمات متوفرة</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">حالة التوافر السريع (Quick Availability)</div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+            <div>
+              <h4 style="font-size:15px; color:#fff; margin-bottom:4px;">حالة قبول المشاريع والتعاقدات</h4>
+              <p style="font-size:13px; color:var(--text-muted);" id="availabilityLabelText">متاح حالياً للمشاريع والاستشارات المعمارية</p>
+            </div>
+            <label class="switch-wrap">
+              <div class="switch">
+                <input type="checkbox" id="quickAvailableToggle">
+                <span class="slider"></span>
+              </div>
+              <span style="font-size:14px; font-weight:600;">نشط / متاح</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">إجراءات سريعة ودليل الاستخدام</div>
+          </div>
+          <p style="font-size:14px; line-height:1.7; color:#b1b7c8; margin-bottom:16px;">
+            مرحباً بك يا أحمد! تتيح لك لوحة التحكم هذه تعديل أي عنصر في الموقع بالكامل: نصوص، عناوين، صور، روابط، مهارات، مشاريع، خدمات، وتواريخ.
+            عند إجراء أي تعديل، اضغط على <strong>"حفظ التغييرات"</strong> ليتم تطبيقها فوراً على موقعك.
+          </p>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button class="btn btn-secondary" onclick="switchTab('projects'); openProjectModal();">
+              + إضافة مشروع جديد
+            </button>
+            <button class="btn btn-secondary" onclick="switchTab('skills'); openSkillModal();">
+              + إضافة تقنية جديدة للنواة
+            </button>
+            <button class="btn btn-secondary" onclick="PortfolioStore.exportJSON(); showToast('تم تنزيل نسخة site-data.json بنجاح');">
+              تصدير نسخة احتياطية (JSON)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 2: PROFILE & HERO ================= -->
+      <section id="tab-profile" class="tab-panel">
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">بيانات الواجهة الرئيسية (Hero Section)</div>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">الاسم المعروض (Full Name)</label>
+              <input type="text" id="profName" class="form-control" placeholder="Ahmed Morgan">
+            </div>
+            <div class="form-group">
+              <label class="form-label">الموقع الجغرافي والمنطقة الزمنية</label>
+              <input type="text" id="profLocation" class="form-control" placeholder="Alexandria, Egypt · GMT+2">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">نص حالة التوافر (Status Badge)</label>
+              <input type="text" id="profStatus" class="form-control" placeholder="Available for Q4 contracts & architecture advisory">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">الأدوار الوظيفية (Typewriter Roles - اضغط Enter لإضافة مسمى)</label>
+              <div class="tags-container" id="rolesContainer">
+                <input type="text" id="roleInput" class="tag-input-field" placeholder="أدخل دوراً واضغط Enter...">
+              </div>
+            </div>
+            <div class="form-group full">
+              <label class="form-label">الوصف الترحيبي (Hero Bio Tagline)</label>
+              <textarea id="profBio" class="form-control" placeholder="الوصف الأساسي في بداية الموقع..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">صورة الملف الشخصي (Portrait Image)</div>
+          </div>
+          <div class="image-uploader">
+            <div class="image-preview" id="portraitPreview">
+              <span class="image-preview-empty">لا توجد صورة</span>
+            </div>
+            <div style="flex:1;">
+              <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
+                يمكنك رفع صورة شخصية من جهازك (سيتم حفظها محلياً وبشكل مضغوط) أو وضع رابط صورة مباشر.
+              </p>
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                <input type="file" id="portraitFileInput" accept="image/*" style="display:none;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('portraitFileInput').click()">
+                  اختيار صورة من الجهاز
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnRemovePortrait">
+                  إزالة الصورة
+                </button>
+              </div>
+              <input type="text" id="portraitUrlInput" class="form-control" placeholder="أو الصق رابط الصورة هنا (URL أو Base64)...">
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">روابط التواصل والشبكات الاجتماعية (Social Links)</div>
+            <button class="btn btn-secondary btn-sm" onclick="openSocialModal()">+ إضافة رابط جديد</button>
+          </div>
+          <div id="socialsList" class="items-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 3: ABOUT & STATS ================= -->
+      <section id="tab-about" class="tab-panel">
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">قسم "نبذة عني" (About Section)</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">عنوان القسم الرئيسي</label>
+            <input type="text" id="aboutTitle" class="form-control" placeholder="Systems that hold up under real use.">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الفقرة التعريفية الأولى</label>
+            <textarea id="aboutPara1" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">الفقرة التعريفية الثانية</label>
+            <textarea id="aboutPara2" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">أرقام وإحصائيات الإنجاز (Counters)</div>
+            <button class="btn btn-secondary btn-sm" onclick="openCounterModal()">+ إضافة عداد إحصائي</button>
+          </div>
+          <div id="countersList" class="items-grid"></div>
+        </div>
+
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">مراحل الرحلة في نبذة عني (About Milestones)</div>
+            <button class="btn btn-secondary btn-sm" onclick="openAboutMilestoneModal()">+ إضافة مرحلة</button>
+          </div>
+          <div id="aboutMilestonesList" class="items-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 4: SKILLS ================= -->
+      <section id="tab-skills" class="tab-panel">
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div>
+              <div class="glass-card-title">نواة التقنيات والمهارات (Core Skills Orbit)</div>
+              <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+                التقنيات التي تدور حول نواتك البرمجية، مقسمة لمدار داخلي ومدار خارجي مع إمكانية إضافة وتعديل وحذف أي تقنية.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openSkillModal()">+ إضافة مهارة جديدة</button>
+          </div>
+          <div id="skillsGrid" class="items-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 5: PROJECTS ================= -->
+      <section id="tab-projects" class="tab-panel">
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div>
+              <div class="glass-card-title">معرض المشاريع المختارة (Selected Work)</div>
+              <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+                تعديل وحذف وإضافة المشاريع المعروضة، مع إمكانية رفع صور المعاينة وتحديث حزم التقنيات والروابط.
+              </p>
+            </div>
+            <button class="btn btn-primary" onclick="openProjectModal()">+ إضافة مشروع جديد</button>
+          </div>
+          <div id="projectsGrid" class="items-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 6: EXPERIENCE / METRO ================= -->
+      <section id="tab-experience" class="tab-panel">
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div>
+              <div class="glass-card-title">مسار الخبرات والتطور (Experience Metro Track)</div>
+              <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+                محطات المترو الزمنية التي تروي قصة بناء خبراتك ومشاريعك بترتيب زمني تفاعلي.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openMetroModal()">+ إضافة محطة مسار</button>
+          </div>
+          <div id="metroList" class="items-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 7: SERVICES ================= -->
+      <section id="tab-services" class="tab-panel">
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div>
+              <div class="glass-card-title">مكعبات الخدمات الزجاجية (Services Glass Cubes)</div>
+              <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+                المكعبات التفاعلية الثلاثية الأبعاد التي تعرض مجالات خدماتك الهندسية والبرمجية.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openServiceModal()">+ إضافة خدمة جديدة</button>
+          </div>
+          <div id="servicesGrid" class="items-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 8: APPROACH ================= -->
+      <section id="tab-approach" class="tab-panel">
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div>
+              <div class="glass-card-title">مبادئ ومنهجية العمل (Approach & Principles)</div>
+              <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+                البطاقات الأفقية المتحركة التي تشرح فلسفتك الهندسية في بناء البرمجيات.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openApproachModal()">+ إضافة مبدأ جديد</button>
+          </div>
+          <div id="approachGrid" class="items-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 9: CONTACT ================= -->
+      <section id="tab-contact" class="tab-panel">
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">بيانات التواصل وقسم التيرمينال (Contact Section)</div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label">عنوان قسم التواصل</label>
+              <input type="text" id="contactTitle" class="form-control" placeholder="Let's build something that holds up.">
+            </div>
+            <div class="form-group">
+              <label class="form-label">البريد الإلكتروني الأساسي</label>
+              <input type="email" id="contactEmail" class="form-control" placeholder="ahmed.morgan86@gmail.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">رقم الهاتف / واتساب</label>
+              <input type="text" id="contactPhone" class="form-control" placeholder="+201097905455">
+            </div>
+            <div class="form-group">
+              <label class="form-label">المدينة / الدولة</label>
+              <input type="text" id="contactLocation" class="form-control" placeholder="Alexandria, Egypt">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">نص حقوق التذييل (Footer Copyright Text)</label>
+              <input type="text" id="contactFooter" class="form-control" placeholder="© 2026 Ahmed Morgan. Engineered with precision.">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 10: SETTINGS ================= -->
+      <section id="tab-settings" class="tab-panel">
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">الأمان وتغيير كلمة المرور (Security)</div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">كلمة المرور الحالية</label>
+              <input type="password" id="oldPinInput" class="form-control" placeholder="كلمة المرور الحالية">
+            </div>
+            <div class="form-group">
+              <label class="form-label">كلمة المرور الجديدة</label>
+              <input type="password" id="newPinInput" class="form-control" placeholder="كلمة المرور الجديدة (4 رموز على الأقل)">
+            </div>
+            <div class="form-group full">
+              <button class="btn btn-primary btn-sm" id="btnChangePin">تحديث كلمة المرور</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="glass-card-title">النسخ الاحتياطي واستعادة البيانات (Backup & Reset)</div>
+          </div>
+          <p style="font-size:14px; color:#b1b7c8; margin-bottom:18px; line-height:1.7;">
+            تتيح لك هذه الخيارات تنزيل كامل بيانات موقعك كملف <code>site-data.json</code>، أو استيراد بيانات سابقة، أو إعادة ضبط المصنع للبيانات الأصلية في أي وقت.
+          </p>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button class="btn btn-secondary" onclick="PortfolioStore.exportJSON(); showToast('تم تصدير ملف البيانات بنجاح');">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              تصدير البيانات (Export JSON)
+            </button>
+            
+            <input type="file" id="importFileInput" accept=".json" style="display:none;">
+            <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              استيراد بيانات (Import JSON)
+            </button>
+            
+            <button class="btn btn-danger" id="btnResetDefaults">
+              إعادة ضبط المصنع للبيانات الأصلية
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- PROJECT MODAL -->
+  <div class="modal-backdrop" id="projectModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="projectModalTitle">إضافة مشروع جديد</h3>
+        <button class="btn-close-modal" onclick="closeModal('projectModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="pModId">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">اسم المشروع (Title)</label>
+            <input type="text" id="pModName" class="form-control" placeholder="مثل: Morgan ERP">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الترقيم / الكود (Index)</label>
+            <input type="text" id="pModIdx" class="form-control" placeholder="مثل: 01">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">الشعار الترويجي (Tagline)</label>
+            <input type="text" id="pModTagline" class="form-control" placeholder="وصف موجز من سطر واحد...">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">حزمة التقنيات المستخدمة (Stack - اضغط Enter لإضافة تقنية)</label>
+            <div class="tags-container" id="pModStackContainer">
+              <input type="text" id="pModStackInput" class="tag-input-field" placeholder="مثل: React, Next.js, .NET...">
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">التحدي الهندسي (Challenge)</label>
+            <textarea id="pModChallenge" class="form-control" rows="2" placeholder="ما التحدي الذي تم حله؟"></textarea>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">المعمارية التقنية (Architecture)</label>
+            <textarea id="pModArchitecture" class="form-control" rows="2" placeholder="كيف تم بناء المعمارية؟"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">رابط المعاينة المباشرة (Live Demo URL)</label>
+            <input type="url" id="pModLiveUrl" class="form-control" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">رابط الكود المصدري (GitHub URL)</label>
+            <input type="url" id="pModGithubUrl" class="form-control" placeholder="https://github.com/...">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">صورة المشروع (Project Preview Image)</label>
+            <div class="image-uploader">
+              <div class="image-preview" id="pModImgPreview" style="width:140px; height:90px;">
+                <span class="image-preview-empty">معاينة الصورة</span>
+              </div>
+              <div style="flex:1;">
+                <input type="file" id="pModImgFile" accept="image/*" style="display:none;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('pModImgFile').click()">
+                  اختيار صورة من الجهاز
+                </button>
+                <input type="text" id="pModImgUrl" class="form-control" style="margin-top:8px;" placeholder="أو الصق رابط الصورة هنا...">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('projectModal')">إلغاء</button>
+        <button class="btn btn-primary" id="btnSaveProject">حفظ المشروع</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKILL MODAL -->
+  <div class="modal-backdrop" id="skillModal">
+    <div class="modal-box" style="max-width:500px;">
+      <div class="modal-header">
+        <h3 id="skillModalTitle">إضافة مهارة جديدة</h3>
+        <button class="btn-close-modal" onclick="closeModal('skillModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="sModId">
+        <div class="form-group">
+          <label class="form-label">اسم التقنية (Skill Name)</label>
+          <input type="text" id="sModName" class="form-control" placeholder="مثل: React, Docker, Python">
+        </div>
+        <div class="form-group">
+          <label class="form-label">الدور / التصنيف (Role / Category)</label>
+          <input type="text" id="sModRole" class="form-control" placeholder="مثل: UI Library, Database, Cloud">
+        </div>
+        <div class="form-group">
+          <label class="form-label">المدار المداري في النواة (Orbit Ring)</label>
+          <select id="sModRing" class="form-control">
+            <option value="inner">المدار الداخلي (Inner Ring - أساسي)</option>
+            <option value="outer">المدار الخارجي (Outer Ring - محيطي)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الوصف التفصيلي (Description)</label>
+          <textarea id="sModDesc" class="form-control" rows="3" placeholder="كيف تستخدم هذه التقنية في أنظمتك؟"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('skillModal')">إلغاء</button>
+        <button class="btn btn-primary" id="btnSaveSkill">حفظ المهارة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- METRO (EXPERIENCE) MODAL -->
+  <div class="modal-backdrop" id="metroModal">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-header">
+        <h3 id="metroModalTitle">إضافة محطة خبرة</h3>
+        <button class="btn-close-modal" onclick="closeModal('metroModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="mModId">
+        <div class="form-group">
+          <label class="form-label">كود / تاريخ المحطة (Station Tag)</label>
+          <input type="text" id="mModTag" class="form-control" placeholder="مثل: STATION 01 أو 2024 - PRESENT">
+        </div>
+        <div class="form-group">
+          <label class="form-label">عنوان المحطة (Title)</label>
+          <input type="text" id="mModTitle" class="form-control" placeholder="مثل: Enterprise Foundations">
+        </div>
+        <div class="form-group">
+          <label class="form-label">تفاصيل المحطة وإنجازاتها (Description)</label>
+          <textarea id="mModDesc" class="form-control" rows="4" placeholder="وصف ما تم بناؤه خلال هذه المحطة..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('metroModal')">إلغاء</button>
+        <button class="btn btn-primary" id="btnSaveMetro">حفظ المحطة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICE MODAL -->
+  <div class="modal-backdrop" id="serviceModal">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-header">
+        <h3 id="serviceModalTitle">إضافة خدمة برمجية</h3>
+        <button class="btn-close-modal" onclick="closeModal('serviceModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="srvModId">
+        <div class="form-group">
+          <label class="form-label">عنوان الخدمة (Service Title)</label>
+          <input type="text" id="srvModTitle" class="form-control" placeholder="مثل: Full-Stack Web Apps">
+        </div>
+        <div class="form-group">
+          <label class="form-label">الأيقونة (Icon Style)</label>
+          <select id="srvModIcon" class="form-control">
+            <option value="code">كود برمجي (Code)</option>
+            <option value="desktop">تطبيق مكتبي (Desktop)</option>
+            <option value="cart">متجر إلكتروني (E-commerce / Cart)</option>
+            <option value="layers">معمارية طبقات (Systems Layers)</option>
+            <option value="bolt">ذكاء اصطناعي وأتمتة (AI &amp; Automation)</option>
+            <option value="grid">واجهات مستخدم (UI/UX Grid)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">شرح تفاصيل الخدمة (Back Face Description)</label>
+          <textarea id="srvModBack" class="form-control" rows="4" placeholder="شرح تفاصيل الخدمة التي تقدمها..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('serviceModal')">إلغاء</button>
+        <button class="btn btn-primary" id="btnSaveService">حفظ الخدمة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPROACH MODAL -->
+  <div class="modal-backdrop" id="approachModal">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-header">
+        <h3 id="approachModalTitle">إضافة مبدأ عمل</h3>
+        <button class="btn-close-modal" onclick="closeModal('approachModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="appModId">
+        <div class="form-group">
+          <label class="form-label">الترقيم (Number)</label>
+          <input type="text" id="appModN" class="form-control" placeholder="مثل: 01">
+        </div>
+        <div class="form-group">
+          <label class="form-label">عنوان المبدأ (Principle Title)</label>
+          <input type="text" id="appModTitle" class="form-control" placeholder="مثل: Architecture before pixels">
+        </div>
+        <div class="form-group">
+          <label class="form-label">شرح المبدأ (Description)</label>
+          <textarea id="appModDesc" class="form-control" rows="3" placeholder="شرح الفلسفة أو طريقة التنفيذ..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('approachModal')">إلغاء</button>
+        <button class="btn btn-primary" id="btnSaveApproach">حفظ المبدأ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOCIAL LINK MODAL -->
+  <div class="modal-backdrop" id="socialModal">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 id="socialModalTitle">إضافة رابط تواصل</h3>
+        <button class="btn-close-modal" onclick="closeModal('socialModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="socModId">
+        <div class="form-group">
+          <label class="form-label">المنصة / التسمية (Label)</label>
+          <input type="text" id="socModLabel" class="form-control" placeholder="مثل: GitHub, LinkedIn, Telegram">
+        </div>
+        <div class="form-group">
+          <label class="form-label">الرابط الكامل (URL)</label>
+          <input type="url" id="socModUrl" class="form-control" placeholder="https://...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('socialModal')">إلغاء</button>
+        <button class="btn btn-primary" id="btnSaveSocial">حفظ الرابط</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUNTER MODAL -->
+  <div class="modal-backdrop" id="counterModal">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 id="counterModalTitle">إضافة عداد إحصائي</h3>
+        <button class="btn-close-modal" onclick="closeModal('counterModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="cntModId">
+        <div class="form-group">
+          <label class="form-label">الرقم (Target Number)</label>
+          <input type="number" id="cntModNum" class="form-control" placeholder="مثل: 6 أو 14">
+        </div>
+        <div class="form-group">
+          <label class="form-label">التسمية (Label)</label>
+          <input type="text" id="cntModLabel" class="form-control" placeholder="مثل: SYSTEMS SHIPPED">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('counterModal')">إلغاء</button>
+        <button class="btn btn-primary" id="btnSaveCounter">حفظ العداد</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT MILESTONE MODAL -->
+  <div class="modal-backdrop" id="aboutMilestoneModal">
+    <div class="modal-box" style="max-width:520px;">
+      <div class="modal-header">
+        <h3 id="aboutMilestoneModalTitle">إضافة مرحلة رحلة</h3>
+        <button class="btn-close-modal" onclick="closeModal('aboutMilestoneModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="atlModId">
+        <div class="form-group">
+          <label class="form-label">الشارة / التصنيف (Tag)</label>
+          <input type="text" id="atlModTag" class="form-control" placeholder="مثل: ENTERPRISE FOUNDATIONS">
+        </div>
+        <div class="form-group">
+          <label class="form-label">العنوان (Title)</label>
+          <input type="text" id="atlModTitle" class="form-control" placeholder="مثل: IT Service &amp; Network Systems">
+        </div>
+        <div class="form-group">
+          <label class="form-label">الوصف (Description)</label>
+          <textarea id="atlModDesc" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('aboutMilestoneModal')">إلغاء</button>
+        <button class="btn btn-primary" id="btnSaveAboutMilestone">حفظ المرحلة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="site-data.js"></script>
+  <script src="portfolio-store.js"></script>
+  <script>
+    // State management
+    let state = null;
+    let currentRoles = [];
+    let currentProjectStack = [];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      initAuth();
+      bindEvents();
+    });
+
+    function initAuth() {
+      if (PortfolioStore.checkAuth()) {
+        unlockDashboard();
+      } else {
+        document.getElementById('loginOverlay').style.display = 'flex';
+        document.getElementById('adminContainer').style.display = 'none';
+      }
+
+      document.getElementById('btnLogin').addEventListener('click', handleLogin);
+      document.getElementById('adminPinInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') handleLogin();
+      });
+
+      document.getElementById('btnLogout').addEventListener('click', () => {
+        PortfolioStore.logout();
+        location.reload();
+      });
+    }
+
+    function handleLogin() {
+      const pin = document.getElementById('adminPinInput').value.trim();
+      if (PortfolioStore.login(pin)) {
+        unlockDashboard();
+        showToast('تم تسجيل الدخول بنجاح', 'success');
+      } else {
+        showToast('كلمة المرور غير صحيحة', 'error');
+        document.getElementById('adminPinInput').value = '';
+        document.getElementById('adminPinInput').focus();
+      }
+    }
+
+    function unlockDashboard() {
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('adminContainer').style.display = 'flex';
+      loadState();
+    }
+
+    function loadState() {
+      state = PortfolioStore.getData();
+      if (!state) {
+        showToast('تعذر تحميل بيانات الموقع', 'error');
+        return;
+      }
+      renderAll();
+    }
+
+    function renderAll() {
+      renderStats();
+      renderProfile();
+      renderAbout();
+      renderSkills();
+      renderProjects();
+      renderExperience();
+      renderServices();
+      renderApproach();
+      renderContact();
+    }
+
+    /* ================= TABS SWITCHING ================= */
+    const tabTitles = {
+      dashboard: { title: 'نظرة عامة على الموقع', desc: 'إحصائيات سريعة وحالة التوافر والتعديلات الأخيرة' },
+      profile: { title: 'الملف الشخصي والواجهة', desc: 'إدارة الاسم، النبذة الترحيبية، الصورة الشخصية والشبكات الاجتماعية' },
+      about: { title: 'نبذة عني والإحصائيات', desc: 'تعديل نصوص النبذة، عدادات الإنجاز، والمراحل التاريخية للرحلة' },
+      skills: { title: 'نواة التقنيات والمهارات', desc: 'إدارة التقنيات التي تدور حول نواتك البرمجية (المدار الداخلي والخارجي)' },
+      projects: { title: 'معرض المشاريع المختارة', desc: 'إضافة وتعديل وحذف المشاريع المعمارية والبرمجية' },
+      experience: { title: 'مسار الخبرات (Build Log)', desc: 'محطات المترو التي تروي تسلسل بناء خبراتك البرمجية' },
+      services: { title: 'الخدمات (Services)', desc: 'المكعبات التفاعلية الثلاثية الأبعاد التي تعرض خدماتك' },
+      approach: { title: 'منهجية العمل (Approach)', desc: 'مبادئ وفلسفة العمل المعمارية والبرمجية' },
+      contact: { title: 'التواصل والبيانات', desc: 'بيانات التواصل المباشر ونصوص التذييل والتيرمينال' },
+      settings: { title: 'الإعدادات والأمان والنسخ', desc: 'تغيير كلمة المرور، وتصدير واستيراد النسخ الاحتياطية' }
+    };
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-tab').forEach(t => {
+        t.classList.toggle('active', t.getAttribute('data-tab') === tabId);
+      });
+      document.querySelectorAll('.tab-panel').forEach(p => {
+        p.classList.toggle('active', p.id === 'tab-' + tabId);
+      });
+      if (tabTitles[tabId]) {
+        document.getElementById('currentTabTitle').textContent = tabTitles[tabId].title;
+        document.getElementById('currentTabDesc').textContent = tabTitles[tabId].desc;
+      }
+    }
+
+    function bindEvents() {
+      // Tab clicks
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
+      });
+
+      // Quick toggle
+      const quickToggle = document.getElementById('quickAvailableToggle');
+      quickToggle.addEventListener('change', () => {
+        if (!state) return;
+        state.profile.statusAvailable = quickToggle.checked;
+        saveAndNotify('تم تحديث حالة التوافر');
+      });
+
+      // Save All button
+      document.getElementById('btnSaveAll').addEventListener('click', () => {
+        collectFormData();
+        saveAndNotify('تم حفظ جميع تعديلات الموقع بنجاح!');
+      });
+
+      // Role input tag system
+      const roleInput = document.getElementById('roleInput');
+      roleInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ',') {
+          e.preventDefault();
+          const val = roleInput.value.trim().replace(/^,+|,+$/g, '');
+          if (val && !currentRoles.includes(val)) {
+            currentRoles.push(val);
+            renderRoles();
+            roleInput.value = '';
+          }
+        }
+      });
+
+      // Project stack tag system
+      const pModStackInput = document.getElementById('pModStackInput');
+      pModStackInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ',') {
+          e.preventDefault();
+          const val = pModStackInput.value.trim().replace(/^,+|,+$/g, '');
+          if (val && !currentProjectStack.includes(val)) {
+            currentProjectStack.push(val);
+            renderProjectStack();
+            pModStackInput.value = '';
+          }
+        }
+      });
+
+      // Image uploaders
+      bindImageUploader('portraitFileInput', 'portraitUrlInput', 'portraitPreview', imgUrl => {
+        if (state) state.profile.portrait = imgUrl;
+      });
+
+      document.getElementById('btnRemovePortrait').addEventListener('click', () => {
+        if (state) {
+          state.profile.portrait = '';
+          document.getElementById('portraitUrlInput').value = '';
+          document.getElementById('portraitPreview').innerHTML = '<span class="image-preview-empty">لا توجد صورة</span>';
+        }
+      });
+
+      bindImageUploader('pModImgFile', 'pModImgUrl', 'pModImgPreview', imgUrl => {
+        // Will be picked up on save
+      });
+
+      // Modals Save Handlers
+      document.getElementById('btnSaveProject').addEventListener('click', saveProjectModal);
+      document.getElementById('btnSaveSkill').addEventListener('click', saveSkillModal);
+      document.getElementById('btnSaveMetro').addEventListener('click', saveMetroModal);
+      document.getElementById('btnSaveService').addEventListener('click', saveServiceModal);
+      document.getElementById('btnSaveApproach').addEventListener('click', saveApproachModal);
+      document.getElementById('btnSaveSocial').addEventListener('click', saveSocialModal);
+      document.getElementById('btnSaveCounter').addEventListener('click', saveCounterModal);
+      document.getElementById('btnSaveAboutMilestone').addEventListener('click', saveAboutMilestoneModal);
+
+      // Change PIN
+      document.getElementById('btnChangePin').addEventListener('click', () => {
+        const oldP = document.getElementById('oldPinInput').value;
+        const newP = document.getElementById('newPinInput').value;
+        const res = PortfolioStore.changePin(oldP, newP);
+        if (res.success) {
+          showToast(res.message, 'success');
+          document.getElementById('oldPinInput').value = '';
+          document.getElementById('newPinInput').value = '';
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+
+      // Reset Defaults
+      document.getElementById('btnResetDefaults').addEventListener('click', () => {
+        if (confirm('هل أنت متأكد من رغبتك في إعادة ضبط المصنع؟ سيتم مسح أي تعديلات والعودة للبيانات الافتراضية.')) {
+          state = PortfolioStore.resetData();
+          renderAll();
+          showToast('تمت استعادة البيانات الافتراضية بنجاح', 'success');
+        }
+      });
+
+      // Import JSON
+      document.getElementById('importFileInput').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            PortfolioStore.importJSON(ev.target.result);
+            loadState();
+            showToast('تم استيراد البيانات وتطبيقها بنجاح!', 'success');
+          } catch (err) {
+            showToast('فشل استيراد الملف: ' + err.message, 'error');
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    function bindImageUploader(fileInputId, urlInputId, previewId, callback) {
+      const fileInput = document.getElementById(fileInputId);
+      const urlInput = document.getElementById(urlInputId);
+      const preview = document.getElementById(previewId);
+
+      fileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const base64 = ev.target.result;
+          urlInput.value = base64;
+          preview.innerHTML = `<img src="${base64}" alt="Preview">`;
+          if (callback) callback(base64);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      urlInput.addEventListener('input', () => {
+        const val = urlInput.value.trim();
+        if (val) {
+          preview.innerHTML = `<img src="${val}" alt="Preview">`;
+          if (callback) callback(val);
+        } else {
+          preview.innerHTML = '<span class="image-preview-empty">معاينة الصورة</span>';
+          if (callback) callback('');
+        }
+      });
+    }
+
+    /* ================= RENDER FUNCTIONS ================= */
+
+    function renderStats() {
+      document.getElementById('statProjectsCount').textContent = state.projects ? state.projects.length : 0;
+      document.getElementById('statSkillsCount').textContent = state.skills ? state.skills.length : 0;
+      document.getElementById('statTimelineCount').textContent = state.experience ? state.experience.length : 0;
+      document.getElementById('statServicesCount').textContent = state.services ? state.services.length : 0;
+
+      const isAvail = state.profile.statusAvailable !== false;
+      document.getElementById('quickAvailableToggle').checked = isAvail;
+      document.getElementById('availabilityLabelText').textContent = isAvail 
+        ? 'متاح حالياً للمشاريع والاستشارات المعمارية'
+        : 'غير متاح حالياً للتعاقدات الجديدة';
+    }
+
+    function renderProfile() {
+      const p = state.profile || {};
+      document.getElementById('profName').value = p.name || '';
+      document.getElementById('profLocation').value = p.location || '';
+      document.getElementById('profStatus').value = p.status || '';
+      document.getElementById('profBio').value = p.bio || '';
+
+      // Portrait
+      if (p.portrait) {
+        document.getElementById('portraitPreview').innerHTML = `<img src="${p.portrait}" alt="Portrait">`;
+        document.getElementById('portraitUrlInput').value = p.portrait.length > 200 ? '(صورة Base64 محفوظة)' : p.portrait;
+      } else {
+        document.getElementById('portraitPreview').innerHTML = '<span class="image-preview-empty">لا توجد صورة</span>';
+        document.getElementById('portraitUrlInput').value = '';
+      }
+
+      // Roles
+      currentRoles = Array.isArray(p.roles) ? [...p.roles] : [];
+      renderRoles();
+
+      // Socials
+      renderSocials();
+    }
+
+    function renderRoles() {
+      const container = document.getElementById('rolesContainer');
+      const input = document.getElementById('roleInput');
+      container.querySelectorAll('.tag-badge').forEach(b => b.remove());
+
+      currentRoles.forEach((role, idx) => {
+        const badge = document.createElement('span');
+        badge.className = 'tag-badge';
+        badge.innerHTML = `${role} <span class="tag-remove" onclick="removeRole(${idx})">&times;</span>`;
+        container.insertBefore(badge, input);
+      });
+    }
+
+    function removeRole(idx) {
+      currentRoles.splice(idx, 1);
+      renderRoles();
+    }
+
+    function renderSocials() {
+      const container = document.getElementById('socialsList');
+      container.innerHTML = '';
+      (state.profile.socials || []).forEach((soc, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div>
+            <div class="item-card-header">
+              <span class="item-badge">${soc.label}</span>
+            </div>
+            <div class="item-card-body" style="word-break:break-all; font-family:var(--font-mono); font-size:12px;">
+              ${soc.url}
+            </div>
+          </div>
+          <div class="item-card-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editSocial(${idx})">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSocial(${idx})">حذف</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderAbout() {
+      const a = state.about || {};
+      document.getElementById('aboutTitle').value = a.title || '';
+      const paras = a.paragraphs || [];
+      document.getElementById('aboutPara1').value = paras[0] || '';
+      document.getElementById('aboutPara2').value = paras[1] || '';
+
+      // Counters
+      const cContainer = document.getElementById('countersList');
+      cContainer.innerHTML = '';
+      (a.counters || []).forEach((cnt, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div>
+            <div class="item-card-header">
+              <div class="item-card-title" style="font-family:var(--font-mono); font-size:22px; color:var(--amber);">${cnt.num}</div>
+            </div>
+            <div class="item-card-body">${cnt.label}</div>
+          </div>
+          <div class="item-card-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editCounter(${idx})">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCounter(${idx})">حذف</button>
+          </div>
+        `;
+        cContainer.appendChild(card);
+      });
+
+      // About Timeline
+      const mContainer = document.getElementById('aboutMilestonesList');
+      mContainer.innerHTML = '';
+      (a.timeline || []).forEach((tl, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div>
+            <div class="item-card-header">
+              <span class="item-badge">${tl.tag}</span>
+            </div>
+            <div class="item-card-title">${tl.title}</div>
+            <div class="item-card-body">${tl.desc}</div>
+          </div>
+          <div class="item-card-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editAboutMilestone(${idx})">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAboutMilestone(${idx})">حذف</button>
+          </div>
+        `;
+        mContainer.appendChild(card);
+      });
+    }
+
+    function renderSkills() {
+      const container = document.getElementById('skillsGrid');
+      container.innerHTML = '';
+      (state.skills || []).forEach((skill, idx) => {
+        const ringLabel = skill.ring === 'inner' ? 'المدار الداخلي' : 'المدار الخارجي';
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div>
+            <div class="item-card-header">
+              <div>
+                <div class="item-card-title">${skill.name}</div>
+                <div class="item-card-subtitle">${skill.role}</div>
+              </div>
+              <span class="item-badge">${ringLabel}</span>
+            </div>
+            <div class="item-card-body">${skill.desc}</div>
+          </div>
+          <div class="item-card-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editSkill(${idx})">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSkill(${idx})">حذف</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderProjects() {
+      const container = document.getElementById('projectsGrid');
+      container.innerHTML = '';
+      (state.projects || []).forEach((proj, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        const imgTag = proj.image ? `<img src="${proj.image}" class="item-card-img" alt="${proj.name}">` : '';
+        const tags = (proj.stack || []).map(s => `<span class="item-tag">${s}</span>`).join('');
+        
+        card.innerHTML = `
+          <div>
+            ${imgTag}
+            <div class="item-card-header">
+              <div>
+                <div class="item-card-title">${proj.name}</div>
+                <div class="item-card-subtitle">${proj.tagline}</div>
+              </div>
+              <span class="item-badge">${proj.idx || '0' + (idx+1)}</span>
+            </div>
+            <div class="item-tags">${tags}</div>
+            <div class="item-card-body" style="font-size:12px;">
+              <strong>التحدي:</strong> ${proj.challenge || '-'}<br>
+              <strong>المعمارية:</strong> ${proj.architecture || '-'}
+            </div>
+          </div>
+          <div class="item-card-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editProject(${idx})">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProject(${idx})">حذف</button>
+            ${proj.liveUrl ? `<a href="${proj.liveUrl}" target="_blank" class="btn btn-secondary btn-sm" style="margin-right:auto;">رابط</a>` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderExperience() {
+      const container = document.getElementById('metroList');
+      container.innerHTML = '';
+      (state.experience || []).forEach((exp, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div>
+            <div class="item-card-header">
+              <span class="item-badge">${exp.tag}</span>
+            </div>
+            <div class="item-card-title">${exp.title}</div>
+            <div class="item-card-body">${exp.desc}</div>
+          </div>
+          <div class="item-card-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editMetro(${idx})">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteMetro(${idx})">حذف</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderServices() {
+      const container = document.getElementById('servicesGrid');
+      container.innerHTML = '';
+      (state.services || []).forEach((srv, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div>
+            <div class="item-card-header">
+              <div class="item-card-title">${srv.title}</div>
+              <span class="item-badge">${srv.icon || 'code'}</span>
+            </div>
+            <div class="item-card-body">${srv.back}</div>
+          </div>
+          <div class="item-card-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editService(${idx})">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteService(${idx})">حذف</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderApproach() {
+      const container = document.getElementById('approachGrid');
+      container.innerHTML = '';
+      (state.approach || []).forEach((app, idx) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div>
+            <div class="item-card-header">
+              <div class="item-card-title">${app.title}</div>
+              <span class="item-badge">${app.n || '0' + (idx+1)}</span>
+            </div>
+            <div class="item-card-body">${app.desc}</div>
+          </div>
+          <div class="item-card-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editApproach(${idx})">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteApproach(${idx})">حذف</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderContact() {
+      const c = state.contact || {};
+      document.getElementById('contactTitle').value = c.title || '';
+      document.getElementById('contactEmail').value = c.email || '';
+      document.getElementById('contactPhone').value = c.phone || '';
+      document.getElementById('contactLocation').value = c.location || '';
+      document.getElementById('contactFooter').value = c.footerText || '';
+    }
+
+    /* ================= DATA COLLECTION & SAVE ================= */
+
+    function collectFormData() {
+      if (!state) return;
+
+      // Profile
+      state.profile.name = document.getElementById('profName').value.trim();
+      state.profile.location = document.getElementById('profLocation').value.trim();
+      state.profile.status = document.getElementById('profStatus').value.trim();
+      state.profile.bio = document.getElementById('profBio').value.trim();
+      state.profile.roles = [...currentRoles];
+
+      // Portrait
+      const portUrl = document.getElementById('portraitUrlInput').value.trim();
+      if (portUrl && !portUrl.startsWith('(صورة Base64')) {
+        state.profile.portrait = portUrl;
+      }
+
+      // About
+      state.about.title = document.getElementById('aboutTitle').value.trim();
+      state.about.paragraphs = [
+        document.getElementById('aboutPara1').value.trim(),
+        document.getElementById('aboutPara2').value.trim()
+      ].filter(Boolean);
+
+      // Contact
+      state.contact.title = document.getElementById('contactTitle').value.trim();
+      state.contact.email = document.getElementById('contactEmail').value.trim();
+      state.contact.phone = document.getElementById('contactPhone').value.trim();
+      state.contact.location = document.getElementById('contactLocation').value.trim();
+      state.contact.footerText = document.getElementById('contactFooter').value.trim();
+    }
+
+    function saveAndNotify(msg) {
+      if (!state) return;
+      collectFormData();
+      PortfolioStore.saveData(state);
+      renderStats();
+      showToast(msg || 'تم الحفظ بنجاح!', 'success');
+    }
+
+    /* ================= MODAL HELPERS ================= */
+
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    /* ================= PROJECTS CRUD ================= */
+
+    function openProjectModal(proj = null, idx = -1) {
+      document.getElementById('pModId').value = idx;
+      document.getElementById('projectModalTitle').textContent = proj ? 'تعديل المشروع' : 'إضافة مشروع جديد';
+      document.getElementById('pModName').value = proj ? proj.name : '';
+      document.getElementById('pModIdx').value = proj ? (proj.idx || '0' + (idx+1)) : '0' + (state.projects.length + 1);
+      document.getElementById('pModTagline').value = proj ? proj.tagline : '';
+      document.getElementById('pModChallenge').value = proj ? proj.challenge : '';
+      document.getElementById('pModArchitecture').value = proj ? proj.architecture : '';
+      document.getElementById('pModLiveUrl').value = proj ? (proj.liveUrl || '') : '';
+      document.getElementById('pModGithubUrl').value = proj ? (proj.githubUrl || '') : '';
+
+      currentProjectStack = proj && proj.stack ? [...proj.stack] : [];
+      renderProjectStack();
+
+      const imgVal = proj ? proj.image : '';
+      document.getElementById('pModImgUrl').value = imgVal ? (imgVal.length > 200 ? '(صورة محفوظة)' : imgVal) : '';
+      document.getElementById('pModImgPreview').innerHTML = imgVal ? `<img src="${imgVal}" alt="Preview">` : '<span class="image-preview-empty">معاينة الصورة</span>';
+
+      openModal('projectModal');
+    }
+
+    function renderProjectStack() {
+      const container = document.getElementById('pModStackContainer');
+      const input = document.getElementById('pModStackInput');
+      container.querySelectorAll('.tag-badge').forEach(b => b.remove());
+
+      currentProjectStack.forEach((tech, i) => {
+        const badge = document.createElement('span');
+        badge.className = 'tag-badge';
+        badge.innerHTML = `${tech} <span class="tag-remove" onclick="removeProjectStackTag(${i})">&times;</span>`;
+        container.insertBefore(badge, input);
+      });
+    }
+
+    function removeProjectStackTag(i) {
+      currentProjectStack.splice(i, 1);
+      renderProjectStack();
+    }
+
+    function saveProjectModal() {
+      const idx = parseInt(document.getElementById('pModId').value);
+      const name = document.getElementById('pModName').value.trim();
+      if (!name) { showToast('يرجى إدخال اسم المشروع', 'error'); return; }
+
+      let img = document.getElementById('pModImgUrl').value.trim();
+      if (idx >= 0 && img === '(صورة محفوظة)') {
+        img = state.projects[idx].image;
+      }
+
+      const projData = {
+        id: idx >= 0 ? state.projects[idx].id : 'proj_' + Date.now(),
+        idx: document.getElementById('pModIdx').value.trim() || '01',
+        name: name,
+        tagline: document.getElementById('pModTagline').value.trim(),
+        stack: [...currentProjectStack],
+        challenge: document.getElementById('pModChallenge').value.trim(),
+        architecture: document.getElementById('pModArchitecture').value.trim(),
+        liveUrl: document.getElementById('pModLiveUrl').value.trim(),
+        githubUrl: document.getElementById('pModGithubUrl').value.trim(),
+        image: img
+      };
+
+      if (!state.projects) state.projects = [];
+      if (idx >= 0) {
+        state.projects[idx] = projData;
+      } else {
+        state.projects.push(projData);
+      }
+
+      closeModal('projectModal');
+      renderProjects();
+      saveAndNotify('تم حفظ المشروع بنجاح');
+    }
+
+    function editProject(idx) {
+      openProjectModal(state.projects[idx], idx);
+    }
+
+    function deleteProject(idx) {
+      if (confirm(`هل أنت متأكد من حذف المشروع "${state.projects[idx].name}"؟`)) {
+        state.projects.splice(idx, 1);
+        renderProjects();
+        saveAndNotify('تم حذف المشروع');
+      }
+    }
+
+    /* ================= SKILLS CRUD ================= */
+
+    function openSkillModal(skill = null, idx = -1) {
+      document.getElementById('sModId').value = idx;
+      document.getElementById('skillModalTitle').textContent = skill ? 'تعديل المهارة' : 'إضافة مهارة جديدة';
+      document.getElementById('sModName').value = skill ? skill.name : '';
+      document.getElementById('sModRole').value = skill ? skill.role : '';
+      document.getElementById('sModRing').value = skill ? (skill.ring || 'inner') : 'inner';
+      document.getElementById('sModDesc').value = skill ? skill.desc : '';
+      openModal('skillModal');
+    }
+
+    function saveSkillModal() {
+      const idx = parseInt(document.getElementById('sModId').value);
+      const name = document.getElementById('sModName').value.trim();
+      if (!name) { showToast('يرجى إدخال اسم التقنية', 'error'); return; }
+
+      const skillData = {
+        id: idx >= 0 ? state.skills[idx].id : 'skill_' + Date.now(),
+        name: name,
+        role: document.getElementById('sModRole').value.trim(),
+        ring: document.getElementById('sModRing').value,
+        desc: document.getElementById('sModDesc').value.trim()
+      };
+
+      if (!state.skills) state.skills = [];
+      if (idx >= 0) {
+        state.skills[idx] = skillData;
+      } else {
+        state.skills.push(skillData);
+      }
+
+      closeModal('skillModal');
+      renderSkills();
+      saveAndNotify('تم حفظ المهارة بنجاح');
+    }
+
+    function editSkill(idx) {
+      openSkillModal(state.skills[idx], idx);
+    }
+
+    function deleteSkill(idx) {
+      if (confirm(`هل أنت متأكد من حذف المهارة "${state.skills[idx].name}"؟`)) {
+        state.skills.splice(idx, 1);
+        renderSkills();
+        saveAndNotify('تم حذف المهارة');
+      }
+    }
+
+    /* ================= METRO CRUD ================= */
+
+    function openMetroModal(item = null, idx = -1) {
+      document.getElementById('mModId').value = idx;
+      document.getElementById('metroModalTitle').textContent = item ? 'تعديل محطة الخبرة' : 'إضافة محطة خبرة';
+      document.getElementById('mModTag').value = item ? item.tag : 'STATION 0' + ((state.experience ? state.experience.length : 0) + 1);
+      document.getElementById('mModTitle').value = item ? item.title : '';
+      document.getElementById('mModDesc').value = item ? item.desc : '';
+      openModal('metroModal');
+    }
+
+    function saveMetroModal() {
+      const idx = parseInt(document.getElementById('mModId').value);
+      const title = document.getElementById('mModTitle').value.trim();
+      if (!title) { showToast('يرجى إدخال عنوان المحطة', 'error'); return; }
+
+      const item = {
+        id: idx >= 0 ? state.experience[idx].id : 'exp_' + Date.now(),
+        tag: document.getElementById('mModTag').value.trim(),
+        title: title,
+        desc: document.getElementById('mModDesc').value.trim()
+      };
+
+      if (!state.experience) state.experience = [];
+      if (idx >= 0) {
+        state.experience[idx] = item;
+      } else {
+        state.experience.push(item);
+      }
+
+      closeModal('metroModal');
+      renderExperience();
+      saveAndNotify('تم حفظ محطة المسار بنجاح');
+    }
+
+    function editMetro(idx) { openMetroModal(state.experience[idx], idx); }
+    function deleteMetro(idx) {
+      if (confirm('هل تريد حذف هذه المحطة من المسار؟')) {
+        state.experience.splice(idx, 1);
+        renderExperience();
+        saveAndNotify('تم حذف المحطة');
+      }
+    }
+
+    /* ================= SERVICES CRUD ================= */
+
+    function openServiceModal(srv = null, idx = -1) {
+      document.getElementById('srvModId').value = idx;
+      document.getElementById('serviceModalTitle').textContent = srv ? 'تعديل الخدمة' : 'إضافة خدمة جديدة';
+      document.getElementById('srvModTitle').value = srv ? srv.title : '';
+      document.getElementById('srvModIcon').value = srv ? (srv.icon || 'code') : 'code';
+      document.getElementById('srvModBack').value = srv ? srv.back : '';
+      openModal('serviceModal');
+    }
+
+    function saveServiceModal() {
+      const idx = parseInt(document.getElementById('srvModId').value);
+      const title = document.getElementById('srvModTitle').value.trim();
+      if (!title) { showToast('يرجى إدخال عنوان الخدمة', 'error'); return; }
+
+      const item = {
+        id: idx >= 0 ? state.services[idx].id : 'srv_' + Date.now(),
+        title: title,
+        icon: document.getElementById('srvModIcon').value,
+        back: document.getElementById('srvModBack').value.trim()
+      };
+
+      if (!state.services) state.services = [];
+      if (idx >= 0) {
+        state.services[idx] = item;
+      } else {
+        state.services.push(item);
+      }
+
+      closeModal('serviceModal');
+      renderServices();
+      saveAndNotify('تم حفظ الخدمة بنجاح');
+    }
+
+    function editService(idx) { openServiceModal(state.services[idx], idx); }
+    function deleteService(idx) {
+      if (confirm('هل تريد حذف هذه الخدمة؟')) {
+        state.services.splice(idx, 1);
+        renderServices();
+        saveAndNotify('تم حذف الخدمة');
+      }
+    }
+
+    /* ================= APPROACH CRUD ================= */
+
+    function openApproachModal(app = null, idx = -1) {
+      document.getElementById('appModId').value = idx;
+      document.getElementById('approachModalTitle').textContent = app ? 'تعديل المبدأ' : 'إضافة مبدأ جديد';
+      document.getElementById('appModN').value = app ? (app.n || '0' + (idx+1)) : '0' + ((state.approach ? state.approach.length : 0) + 1);
+      document.getElementById('appModTitle').value = app ? app.title : '';
+      document.getElementById('appModDesc').value = app ? app.desc : '';
+      openModal('approachModal');
+    }
+
+    function saveApproachModal() {
+      const idx = parseInt(document.getElementById('appModId').value);
+      const title = document.getElementById('appModTitle').value.trim();
+      if (!title) { showToast('يرجى إدخال عنوان المبدأ', 'error'); return; }
+
+      const item = {
+        id: idx >= 0 ? state.approach[idx].id : 'app_' + Date.now(),
+        n: document.getElementById('appModN').value.trim(),
+        title: title,
+        desc: document.getElementById('appModDesc').value.trim()
+      };
+
+      if (!state.approach) state.approach = [];
+      if (idx >= 0) {
+        state.approach[idx] = item;
+      } else {
+        state.approach.push(item);
+      }
+
+      closeModal('approachModal');
+      renderApproach();
+      saveAndNotify('تم حفظ المبدأ بنجاح');
+    }
+
+    function editApproach(idx) { openApproachModal(state.approach[idx], idx); }
+    function deleteApproach(idx) {
+      if (confirm('هل تريد حذف هذا المبدأ؟')) {
+        state.approach.splice(idx, 1);
+        renderApproach();
+        saveAndNotify('تم حذف المبدأ');
+      }
+    }
+
+    /* ================= SOCIALS CRUD ================= */
+
+    function openSocialModal(soc = null, idx = -1) {
+      document.getElementById('socModId').value = idx;
+      document.getElementById('socialModalTitle').textContent = soc ? 'تعديل رابط التواصل' : 'إضافة رابط تواصل';
+      document.getElementById('socModLabel').value = soc ? soc.label : '';
+      document.getElementById('socModUrl').value = soc ? soc.url : '';
+      openModal('socialModal');
+    }
+
+    function saveSocialModal() {
+      const idx = parseInt(document.getElementById('socModId').value);
+      const label = document.getElementById('socModLabel').value.trim();
+      const url = document.getElementById('socModUrl').value.trim();
+      if (!label || !url) { showToast('يرجى ملء جميع الحقول', 'error'); return; }
+
+      const item = {
+        id: idx >= 0 ? state.profile.socials[idx].id : 'soc_' + Date.now(),
+        label: label,
+        url: url,
+        icon: label.toLowerCase()
+      };
+
+      if (!state.profile.socials) state.profile.socials = [];
+      if (idx >= 0) {
+        state.profile.socials[idx] = item;
+      } else {
+        state.profile.socials.push(item);
+      }
+
+      closeModal('socialModal');
+      renderSocials();
+      saveAndNotify('تم حفظ رابط التواصل بنجاح');
+    }
+
+    function editSocial(idx) { openSocialModal(state.profile.socials[idx], idx); }
+    function deleteSocial(idx) {
+      if (confirm('هل تريد حذف هذا الرابط؟')) {
+        state.profile.socials.splice(idx, 1);
+        renderSocials();
+        saveAndNotify('تم حذف الرابط');
+      }
+    }
+
+    /* ================= COUNTERS CRUD ================= */
+
+    function openCounterModal(cnt = null, idx = -1) {
+      document.getElementById('cntModId').value = idx;
+      document.getElementById('counterModalTitle').textContent = cnt ? 'تعديل العداد' : 'إضافة عداد إحصائي';
+      document.getElementById('cntModNum').value = cnt ? cnt.num : 0;
+      document.getElementById('cntModLabel').value = cnt ? cnt.label : '';
+      openModal('counterModal');
+    }
+
+    function saveCounterModal() {
+      const idx = parseInt(document.getElementById('cntModId').value);
+      const num = parseInt(document.getElementById('cntModNum').value) || 0;
+      const label = document.getElementById('cntModLabel').value.trim();
+      if (!label) { showToast('يرجى إدخال تسمية العداد', 'error'); return; }
+
+      const item = {
+        id: idx >= 0 ? state.about.counters[idx].id : 'cnt_' + Date.now(),
+        num: num,
+        label: label
+      };
+
+      if (!state.about.counters) state.about.counters = [];
+      if (idx >= 0) {
+        state.about.counters[idx] = item;
+      } else {
+        state.about.counters.push(item);
+      }
+
+      closeModal('counterModal');
+      renderAbout();
+      saveAndNotify('تم حفظ العداد بنجاح');
+    }
+
+    function editCounter(idx) { openCounterModal(state.about.counters[idx], idx); }
+    function deleteCounter(idx) {
+      if (confirm('هل تريد حذف هذا العداد؟')) {
+        state.about.counters.splice(idx, 1);
+        renderAbout();
+        saveAndNotify('تم حذف العداد');
+      }
+    }
+
+    /* ================= ABOUT MILESTONES CRUD ================= */
+
+    function openAboutMilestoneModal(item = null, idx = -1) {
+      document.getElementById('atlModId').value = idx;
+      document.getElementById('aboutMilestoneModalTitle').textContent = item ? 'تعديل المرحلة' : 'إضافة مرحلة رحلة';
+      document.getElementById('atlModTag').value = item ? item.tag : '';
+      document.getElementById('atlModTitle').value = item ? item.title : '';
+      document.getElementById('atlModDesc').value = item ? item.desc : '';
+      openModal('aboutMilestoneModal');
+    }
+
+    function saveAboutMilestoneModal() {
+      const idx = parseInt(document.getElementById('atlModId').value);
+      const title = document.getElementById('atlModTitle').value.trim();
+      if (!title) { showToast('يرجى إدخال عنوان المرحلة', 'error'); return; }
+
+      const item = {
+        id: idx >= 0 ? state.about.timeline[idx].id : 'atl_' + Date.now(),
+        tag: document.getElementById('atlModTag').value.trim(),
+        title: title,
+        desc: document.getElementById('atlModDesc').value.trim()
+      };
+
+      if (!state.about.timeline) state.about.timeline = [];
+      if (idx >= 0) {
+        state.about.timeline[idx] = item;
+      } else {
+        state.about.timeline.push(item);
+      }
+
+      closeModal('aboutMilestoneModal');
+      renderAbout();
+      saveAndNotify('تم حفظ المرحلة بنجاح');
+    }
+
+    function editAboutMilestone(idx) { openAboutMilestoneModal(state.about.timeline[idx], idx); }
+    function deleteAboutMilestone(idx) {
+      if (confirm('هل تريد حذف هذه المرحلة؟')) {
+        state.about.timeline.splice(idx, 1);
+        renderAbout();
+        saveAndNotify('تم حذف المرحلة');
+      }
+    }
+
+    /* ================= TOAST NOTIFICATIONS ================= */
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <span class="toast-icon">
+          ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}
+        </span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all .3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
