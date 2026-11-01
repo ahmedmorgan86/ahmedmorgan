@@ -425,31 +425,61 @@ window.DEFAULT_PORTFOLIO_DATA = {
       "id": "exp_1",
       "tag": "STATION 01",
       "title": "Enterprise Foundations",
-      "desc": "ACCHCO EUSMS and Network Nexus — IT service management and live network monitoring built for daily operational use."
+      "desc": "ACCHCO EUSMS and Network Nexus — IT service management and live network monitoring built for daily operational use.",
+      "tag_en": "STATION 01",
+      "tag_ar": "المحطة 01",
+      "title_en": "Enterprise Foundations",
+      "title_ar": "ركائز أنظمة المؤسسات",
+      "desc_en": "ACCHCO EUSMS and Network Nexus — IT service management and live network monitoring built for daily operational use.",
+      "desc_ar": "نظام ACCHCO EUSMS ونظام Network Nexus — إدارة خدمات تكنولوجيا المعلومات والمراقبة الحية للشبكات المخصصة للاستخدام اليومي المستمر."
     },
     {
       "id": "exp_2",
       "tag": "STATION 02",
       "title": "Client-Facing Platforms",
-      "desc": "alexcont.com — a bilingual corporate site taken through full evaluation and redesign."
+      "desc": "alexcont.com — a bilingual corporate site taken through full evaluation and redesign.",
+      "tag_en": "STATION 02",
+      "tag_ar": "المحطة 02",
+      "title_en": "Client-Facing Platforms",
+      "title_ar": "المنصات الموجهة للعملاء",
+      "desc_en": "alexcont.com — a bilingual corporate site taken through full evaluation and redesign.",
+      "desc_ar": "موقع alexcont.com — منصة مؤسسية ثنائية اللغة خضعت لإعادة تقييم وهندسة بصرية وبرمجية شاملة."
     },
     {
       "id": "exp_3",
       "tag": "STATION 03",
       "title": "Commerce &amp; Operations",
-      "desc": "Morgan Store — storefront and commerce systems built for real transactions."
+      "desc": "Morgan Store — storefront and commerce systems built for real transactions.",
+      "tag_en": "STATION 03",
+      "tag_ar": "المحطة 03",
+      "title_en": "Commerce & Operations",
+      "title_ar": "التجارة والعمليات التشغيلية",
+      "desc_en": "Morgan Store — storefront and commerce systems built for real transactions.",
+      "desc_ar": "متجر Morgan Store — واجهات وأنظمة تجارة إلكترونية مبنية للتعاملات والمبيعات الحقيقية."
     },
     {
       "id": "exp_4",
       "tag": "STATION 04",
       "title": "Platform Engineering",
-      "desc": "Morgan ERP — the largest system yet, unifying HR, finance, sales, inventory and CRM."
+      "desc": "Morgan ERP — the largest system yet, unifying HR, finance, sales, inventory and CRM.",
+      "tag_en": "STATION 04",
+      "tag_ar": "المحطة 04",
+      "title_en": "Platform Engineering",
+      "title_ar": "هندسة المنصات الكبرى",
+      "desc_en": "Morgan ERP — the largest system yet, unifying HR, finance, sales, inventory and CRM.",
+      "desc_ar": "نظام Morgan ERP — أضخم منصة متكاملة توحد الموارد البشرية والمالية والمبيعات والمخزون وإدارة علاقات العملاء."
     },
     {
       "id": "exp_5",
       "tag": "NOW",
       "title": "Next System",
-      "desc": "Exploring AI-assisted engineering workflows and new product ideas."
+      "desc": "Exploring AI-assisted engineering workflows and new product ideas.",
+      "tag_en": "NOW",
+      "tag_ar": "المحطة الحالية",
+      "title_en": "Next System",
+      "title_ar": "الجيل القادم من الأنظمة",
+      "desc_en": "Exploring AI-assisted engineering workflows and new product ideas.",
+      "desc_ar": "استكشاف أحدث مسارات التطوير الهندسي المدعومة بالذكاء الاصطناعي وبناء منتجات رائدة."
     }
   ],
   "services": [

@@ -5,32 +5,42 @@
 (function(window) {
   'use strict';
 
-  const STORAGE_KEY = 'ahmedmorgan_site_data_v1';
+  const STORAGE_KEY = 'ahmedmorgan_site_data_v2';
   const AUTH_KEY = 'ahmedmorgan_admin_auth_v1';
-  const DEFAULT_PIN = '123456'; // Default admin password / PIN
+  const DEFAULT_PIN = '123456';
+
+  function deepMerge(target, source) {
+    if (!source) return target;
+    const output = Object.assign({}, target);
+    for (const key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
+          output[key] = deepMerge(target[key] || {}, source[key]);
+        } else {
+          output[key] = source[key];
+        }
+      }
+    }
+    return output;
+  }
 
   const PortfolioStore = {
-    /**
-     * Get current data from localStorage or fallback to default data
-     */
     getData: function() {
+      const defaults = this.getDefaultData();
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (parsed && parsed.profile && parsed.projects) {
-            return parsed;
+            return deepMerge(defaults, parsed);
           }
         }
       } catch (err) {
         console.warn('Failed to parse stored portfolio data:', err);
       }
-      return this.getDefaultData();
+      return defaults;
     },
 
-    /**
-     * Get the default baseline data
-     */
     getDefaultData: function() {
       if (window.DEFAULT_PORTFOLIO_DATA) {
         return JSON.parse(JSON.stringify(window.DEFAULT_PORTFOLIO_DATA));
@@ -38,9 +48,6 @@
       return null;
     },
 
-    /**
-     * Save data to localStorage
-     */
     saveData: function(data) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -52,9 +59,6 @@
       }
     },
 
-    /**
-     * Reset data to default factory settings
-     */
     resetData: function() {
       try {
         localStorage.removeItem(STORAGE_KEY);
@@ -67,9 +71,6 @@
       }
     },
 
-    /**
-     * Export data as a downloadable JSON file
-     */
     exportJSON: function() {
       const data = this.getData();
       const jsonStr = JSON.stringify(data, null, 2);
@@ -84,9 +85,6 @@
       URL.revokeObjectURL(url);
     },
 
-    /**
-     * Import JSON string and apply to store
-     */
     importJSON: function(jsonStr) {
       try {
         const parsed = JSON.parse(jsonStr);
@@ -100,9 +98,6 @@
       }
     },
 
-    /**
-     * Simple Auth check for Admin panel
-     */
     checkAuth: function() {
       return sessionStorage.getItem(AUTH_KEY) === 'authenticated';
     },

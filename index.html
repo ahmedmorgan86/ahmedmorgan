@@ -15,6 +15,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Manrope:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
+
 /* ============================================================
    DESIGN TOKENS
    ============================================================ */
@@ -716,7 +718,7 @@ footer{
 }
 
 /* ============================================================
-   BILINGUAL & RTL STYLES
+   BILINGUAL & RTL STYLES (CAIRO FONT & PROPER ARABIC SUPPORT)
    ============================================================ */
 .lang-switch-btn {
   background: rgba(255, 184, 0, 0.08);
@@ -751,15 +753,60 @@ footer{
   color: #4a5168;
 }
 
-/* Arabic RTL Typography */
-html[dir="rtl"], body.is-arabic {
-  font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+/* CAIRO FONT FOR ARABIC EVERYWHERE */
+html[dir="rtl"],
+html[lang="ar"],
+body.is-arabic,
+body.is-arabic * {
+  font-family: 'Cairo', system-ui, -apple-system, sans-serif !important;
 }
+
+/* Preserve Monospace for Technical Elements */
+body.is-arabic code,
+body.is-arabic pre,
+body.is-arabic .proj-index,
+body.is-arabic .item-tag,
+body.is-arabic .proj-stack span,
+body.is-arabic .m-tag,
+body.is-arabic .num,
+body.is-arabic .lang-switch-btn {
+  font-family: 'JetBrains Mono', 'Cairo', monospace !important;
+}
+
+/* FIX DISAPPEARING SECTIONS: Guarantee Visibility */
+body.is-arabic .reveal,
+html[dir="rtl"] .reveal,
+.reveal.revealed,
+.page-ready .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+/* FIX TEXT REVERSAL IN HERO ROLES */
 html[dir="rtl"] .hero-roles {
-  direction: ltr;
-  display: inline-flex;
-  justify-content: flex-end;
+  direction: rtl !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: right !important;
 }
+html[dir="rtl"] .hero-roles .prompt {
+  margin-left: 8px !important;
+  margin-right: 0 !important;
+}
+html[dir="rtl"] .role-cursor {
+  margin-right: 4px !important;
+  margin-left: 0 !important;
+}
+
+/* FIX HERO NAME DISCONNECTED LETTERS IN ARABIC */
+.hero-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* FIX LAYOUT IN RTL */
 html[dir="rtl"] .nav-inner {
   direction: rtl;
 }
@@ -769,19 +816,56 @@ html[dir="rtl"] .nav-inner .links {
 html[dir="rtl"] .about-grid {
   direction: rtl;
 }
-html[dir="rtl"] .timeline {
-  border-left: none;
-  border-right: 1px solid var(--border);
-  padding-left: 0;
-  padding-right: 32px;
-}
-html[dir="rtl"] .tl-item::before {
-  left: auto;
-  right: -37px;
-}
-html[dir="rtl"] .metro-stop {
+html[dir="rtl"] .section-head {
   text-align: right;
 }
+html[dir="rtl"] .hero-eyebrow {
+  justify-content: flex-start;
+}
+html[dir="rtl"] .hero-socials {
+  justify-content: flex-start;
+}
+html[dir="rtl"] .hero-actions {
+  justify-content: flex-start;
+}
+
+/* ABOUT TIMELINE RTL */
+html[dir="rtl"] .timeline {
+  border-left: none !important;
+  border-right: 1px solid var(--border) !important;
+  padding-left: 0 !important;
+  padding-right: 32px !important;
+  text-align: right !important;
+}
+html[dir="rtl"] .tl-item::before {
+  left: auto !important;
+  right: -37px !important;
+}
+
+/* METRO TRACK RTL */
+html[dir="rtl"] .metro-track {
+  left: auto !important;
+  right: 20px !important;
+}
+html[dir="rtl"] .metro-stop {
+  padding: 0 62px 56px 0 !important;
+  text-align: right !important;
+}
+html[dir="rtl"] .metro-stop .node {
+  left: auto !important;
+  right: 11px !important;
+}
+
+/* FIX APPROACH CAROUSEL DISAPPEARING IN RTL */
+html[dir="rtl"] .approach-track-wrap {
+  direction: ltr !important;
+}
+html[dir="rtl"] .appr-card {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* TERMINAL REMAINS CODE FORMATTED */
 html[dir="rtl"] .terminal {
   direction: ltr;
 }
@@ -1563,22 +1647,41 @@ function startPageAnimations(){
 
 function animateHeroName(){
   const el = document.getElementById('heroName');
-  const text = (_STORE_DATA && _STORE_DATA.profile && _STORE_DATA.profile.name) ? _STORE_DATA.profile.name : 'Ahmed Morgan';
-  el.innerHTML = '';
-  [...text].forEach((ch,i)=>{
-    const span = document.createElement('span');
-    span.className = 'char' + (i>=6 ? ' amber-word':'');
-    span.textContent = ch === ' ' ? '\u00A0' : ch;
-    el.appendChild(span);
-  });
-  if(!window.gsap) return;
-  gsap.to('#heroName .char', {
-    opacity:1, y:0, rotate:0, duration:.8, ease:'back.out(1.6)', stagger:0.045, delay:.1
-  });
-  gsap.from('.hero-eyebrow', {opacity:0, y:14, duration:.7, delay:0});
-  gsap.from('.hero-desc, .hero-actions', {opacity:0, y:20, duration:.8, stagger:.12, delay:1});
-  gsap.from('.hero .hero-socials', {opacity:0, y:18, duration:.7, delay:1.5, ease:'power3.out'});
-  gsap.from('.portrait-stage', {opacity:0, scale:.92, duration:1.1, ease:'power3.out', delay:.3});
+  if(!el) return;
+  const lang = window.PortfolioI18n ? window.PortfolioI18n.getLang() : 'ar';
+  
+  if (lang === 'ar') {
+    // In Arabic: keep cursive words intact (NO individual letter splitting)
+    el.innerHTML = '<span class="hero-word">أحمد</span> <span class="hero-word amber-word">مرجان</span>';
+    if(window.gsap) {
+      gsap.fromTo('#heroName .hero-word', 
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.15, delay: .1 }
+      );
+    }
+  } else {
+    // English letter animation
+    const text = (_STORE_DATA && _STORE_DATA.profile && _STORE_DATA.profile.name) ? _STORE_DATA.profile.name : 'Ahmed Morgan';
+    el.innerHTML = '';
+    [...text].forEach((ch,i)=>{
+      const span = document.createElement('span');
+      span.className = 'char' + (i>=6 ? ' amber-word':'');
+      span.textContent = ch === ' ' ? '\u00A0' : ch;
+      el.appendChild(span);
+    });
+    if(window.gsap) {
+      gsap.to('#heroName .char', {
+        opacity:1, y:0, rotate:0, duration:.8, ease:'back.out(1.6)', stagger:0.045, delay:.1
+      });
+    }
+  }
+
+  if(window.gsap) {
+    gsap.from('.hero-eyebrow', {opacity:0, y:14, duration:.7, delay:0});
+    gsap.from('.hero-desc, .hero-actions', {opacity:0, y:20, duration:.8, stagger:.12, delay:1});
+    gsap.from('.hero .hero-socials', {opacity:0, y:18, duration:.7, delay:1.5, ease:'power3.out'});
+    gsap.from('.portrait-stage', {opacity:0, scale:.92, duration:1.1, ease:'power3.out', delay:.3});
+  }
 }
 
 function animateRoles(){
@@ -1634,15 +1737,27 @@ function animatePortraitScan(){
 /* ============================================================
    BUILD SKILLS ORBIT
    ============================================================ */
-(function buildSkills(){
+function buildSkills(){
   const wrap = document.getElementById('coreWrap');
+  if (!wrap) return;
   const ring1 = document.getElementById('ring1');
   const ring2 = document.getElementById('ring2');
+  
+  // Clear previous rotating holders
+  wrap.querySelectorAll('.orbit-holder').forEach(h => h.remove());
+
+  // Update center node text
+  const centerEl = wrap.querySelector('.core-center');
+  if (centerEl && window.PortfolioI18n) {
+    centerEl.innerHTML = window.PortfolioI18n.t('skills_center');
+  }
+
   const inner = SKILLS.slice(0,6);
   const outer = SKILLS.slice(6);
 
   function place(list, radiusPct, duration, reverse){
     const holder = document.createElement('div');
+    holder.className = 'orbit-holder';
     holder.style.position='absolute'; holder.style.inset='0';
     list.forEach((s,i)=>{
       const angle = (360/list.length) * i;
@@ -1689,7 +1804,8 @@ function animatePortraitScan(){
   ring1.style.transform = 'translate(-50%,-50%)';
   ring2.style.width = ring2.style.height = '88%';
   ring2.style.transform = 'translate(-50%,-50%)';
-})();
+}
+buildSkills();
 
 /* counter-rotate labels so text stays upright */
 const styleFix = document.createElement('style');
@@ -2154,10 +2270,20 @@ function renderBilingualContent(lang) {
   }
 
   // Refresh dynamic builders
+  buildSkills();
   buildProjects();
   buildMetro();
   buildCubes();
   buildApproach();
+
+  // Mark all reveal elements as visible so nothing disappears
+  document.querySelectorAll('.reveal').forEach(el => {
+    el.classList.add('revealed');
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+    el.style.visibility = 'visible';
+  });
+  if (window.ScrollTrigger) ScrollTrigger.refresh();
 }
 
 // Initial Bilingual setup

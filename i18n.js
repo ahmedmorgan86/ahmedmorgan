@@ -35,6 +35,7 @@
       skills_eyebrow: '02 / STACK',
       skills_title: 'The Core.',
       skills_sub: 'Every technology orbiting one architecture. Hover to inspect, click for detail.',
+      skills_center: 'Ahmed<br>Morgan',
       skills_hint: '14 technologies · click a node for details',
       skills_modal_role: 'Role / Focus',
 
@@ -84,19 +85,19 @@
       nav_brand: 'أحمد مرجان',
       nav_about: 'نبذة عني',
       nav_skills: 'المهارات',
-      nav_projects: 'المشاريع',
-      nav_experience: 'مسار الخبرة',
+      nav_projects: 'الأعمال والمشاريع',
+      nav_experience: 'سجل الخبرات',
       nav_services: 'الخدمات',
-      nav_approach: 'المنهجية',
+      nav_approach: 'منهجية العمل',
       nav_contact: 'تواصل معي',
-      nav_hire: 'طلب مشروع',
+      nav_hire: 'اطلب مشروعاً',
       nav_admin: 'لوحة التحكم',
 
       // Hero
       hero_scroll: 'مرر لأسفل',
       hero_cta_work: 'استكشف الأعمال',
       hero_cta_contact: 'تواصل معي',
-      hero_frame_label: 'أحمد مرجان // تطوير شامل · ذكاء اصطناعي · معمارية نظم',
+      hero_frame_label: 'أحمد مرجان // تطوير متكامل · ذكاء اصطناعي · معمارية برمجيات',
 
       // About
       about_eyebrow: '01 / نبذة عني',
@@ -106,8 +107,9 @@
       skills_eyebrow: '02 / حزمة التقنيات',
       skills_title: 'النواة البرمجية.',
       skills_sub: 'كل تقنية تدور في فلك معمارية متماسكة. مرر للمعاينة، واضغط للتفاصيل.',
+      skills_center: 'أحمد<br>مرجان',
       skills_hint: '14 تقنية أساسية · اضغط على أي عنصر للتفاصيل',
-      skills_modal_role: 'الدور / التخصص',
+      skills_modal_role: 'الدور والتخصص',
 
       // Projects
       projects_eyebrow: '03 / أعمال مختارة',
@@ -156,11 +158,11 @@
     getLang: function() {
       const saved = localStorage.getItem(LANG_STORAGE_KEY);
       if (saved === 'ar' || saved === 'en') return saved;
-      return 'en'; // default language
+      return 'ar'; // Default to Arabic if user requested Arabic!
     },
 
     setLang: function(lang) {
-      if (lang !== 'ar' && lang !== 'en') lang = 'en';
+      if (lang !== 'ar' && lang !== 'en') lang = 'ar';
       localStorage.setItem(LANG_STORAGE_KEY, lang);
       this.applyLangToDocument(lang);
       window.dispatchEvent(new CustomEvent('portfolioLanguageChanged', { detail: { lang } }));
@@ -169,7 +171,7 @@
 
     toggleLang: function() {
       const current = this.getLang();
-      const next = current === 'en' ? 'ar' : 'en';
+      const next = current === 'ar' ? 'en' : 'ar';
       return this.setLang(next);
     },
 
@@ -188,13 +190,9 @@
       if (UI_STRINGS[lang] && UI_STRINGS[lang][key]) {
         return UI_STRINGS[lang][key];
       }
-      return (UI_STRINGS.en && UI_STRINGS.en[key]) || key;
+      return (UI_STRINGS.ar && UI_STRINGS.ar[key]) || (UI_STRINGS.en && UI_STRINGS.en[key]) || key;
     },
 
-    /**
-     * Helper to get bilingual field from data item
-     * e.g. getText(proj, 'name') -> proj.name_ar when lang is ar, else proj.name
-     */
     getText: function(item, field) {
       if (!item) return '';
       const lang = this.getLang();
@@ -204,10 +202,6 @@
       return item[field + '_en'] || item[field] || item[field + '_ar'] || '';
     },
 
-    /**
-     * Helper to get bilingual array from data item
-     * e.g. getArray(data.profile, 'roles')
-     */
     getArray: function(item, field) {
       if (!item) return [];
       const lang = this.getLang();
