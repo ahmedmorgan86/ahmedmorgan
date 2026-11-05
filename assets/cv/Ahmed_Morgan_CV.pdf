@@ -1,0 +1,161 @@
+%PDF-1.4
+1 0 obj
+<<
+  /Type /Catalog
+  /Pages 2 0 R
+>>
+endobj
+2 0 obj
+<<
+  /Type /Pages
+  /Kids [3 0 R]
+  /Count 1
+>>
+endobj
+3 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Contents 4 0 R
+  /Resources <<
+    /Font <<
+      /F1 5 0 R
+      /F2 6 0 R
+    >>
+  >>
+>>
+endobj
+4 0 obj
+<<
+  /Length 1250
+>>
+stream
+BT
+/F1 24 Tf
+40 800 Td
+(Ahmed Morgan) Tj
+ET
+BT
+/F2 12 Tf
+40 780 Td
+(Senior Full-Stack Developer & Software Architect) Tj
+ET
+BT
+/F2 10 Tf
+40 765 Td
+(Alexandria, Egypt | ahmed.morgan86@gmail.com | github.com/ahmedmorgan86) Tj
+ET
+BT
+/F1 14 Tf
+40 730 Td
+(EXECUTIVE PROFILE) Tj
+ET
+BT
+/F2 10 Tf
+40 710 Td
+(Architecture-first engineer with deep expertise in enterprise desktop systems,) Tj
+40 695 Td
+(high-performance web platforms, and commerce systems. Specializing in strict) Tj
+40 680 Td
+(type contracts end-to-end, resilient domain modeling, and bilingual RTL interfaces.) Tj
+ET
+BT
+/F1 14 Tf
+40 645 Td
+(CORE COMPETENCIES) Tj
+ET
+BT
+/F2 10 Tf
+40 625 Td
+(- Full-Stack: React, Next.js 15, TypeScript, Node.js, NestJS, Python) Tj
+40 610 Td
+(- Enterprise & Desktop: C#, .NET 8, WPF, MVVM, SQLite, EF Core, LDAP/Active Directory) Tj
+40 595 Td
+(- Cloud & Databases: PostgreSQL, Supabase, MongoDB, Redis, Docker, AWS, Azure) Tj
+40 580 Td
+(- Architecture & UX: Micro-frontends, Modular ERP design, Real-time ICMP monitoring) Tj
+ET
+BT
+/F1 14 Tf
+40 545 Td
+(KEY ARCHITECTURAL PROJECTS) Tj
+ET
+BT
+/F1 11 Tf
+40 525 Td
+(1. Morgan ERP (Next.js 15, React 19, TypeScript, Supabase Postgres)) Tj
+ET
+BT
+/F2 9.5 Tf
+40 510 Td
+(Modular enterprise platform unifying HR, finance, sales, inventory, CRM, and analytics.) Tj
+ET
+BT
+/F1 11 Tf
+40 485 Td
+(2. ACCHCO EUSMS (.NET 8, WPF, SQLite, EF Core, Active Directory)) Tj
+ET
+BT
+/F2 9.5 Tf
+40 470 Td
+(End-user service management desktop system with Arabic RTL-first interface & LDAP sync.) Tj
+ET
+BT
+/F1 11 Tf
+40 445 Td
+(3. Network Nexus (C# / .NET 8, WPF, MVVM, ICMP)) Tj
+ET
+BT
+/F2 9.5 Tf
+40 430 Td
+(Real-time network latency & status monitoring dashboard across enterprise zones.) Tj
+ET
+BT
+/F1 11 Tf
+40 405 Td
+(4. Morgan Store (Next.js 16, React 19, Tailwind CSS 4, TypeScript)) Tj
+ET
+BT
+/F2 9.5 Tf
+40 390 Td
+(High-performance e-commerce storefront with client-side indexing and instant filtering.) Tj
+ET
+BT
+/F2 9 Tf
+40 340 Td
+(Full portfolio and live demonstrations available at: https://ahmedmorgandev.vercel.app) Tj
+ET
+endstream
+endobj
+5 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Helvetica-Bold
+>>
+endobj
+6 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Helvetica
+>>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000262 00000 n 
+0000001564 00000 n 
+0000001635 00000 n 
+trailer
+<<
+  /Size 7
+  /Root 1 0 R
+>>
+startxref
+1701
+%%EOF

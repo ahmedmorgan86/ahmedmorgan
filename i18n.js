@@ -25,6 +25,7 @@
       hero_scroll: 'SCROLL',
       hero_cta_work: 'Explore Work',
       hero_cta_contact: 'Initiate Contact',
+      hero_cta_cv: 'Download CV',
       hero_frame_label: 'AM // FULL-STACK · AI · ARCHITECTURE',
 
       // About
@@ -97,6 +98,7 @@
       hero_scroll: 'مرر لأسفل',
       hero_cta_work: 'استكشف الأعمال',
       hero_cta_contact: 'تواصل معي',
+      hero_cta_cv: 'تحميل السيرة الذاتية',
       hero_frame_label: 'أحمد مرجان // تطوير متكامل · ذكاء اصطناعي · معمارية برمجيات',
 
       // About
